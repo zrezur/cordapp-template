@@ -1,8 +1,9 @@
 package com.csg.oniontrading.service;
 
-import com.csg.oniontrading.flow.ExampleFlow;
-import com.csg.oniontrading.flow.ExampleFlow;
-import com.csg.oniontrading.flow.TradingFlow;
+import com.csg.oniontrading.flow.IssueAndSendToRiskManager;
+import com.csg.oniontrading.flow.IssuerRiskManagerApprove;
+import com.csg.oniontrading.flow.IssuerRiskManagerTradingStore;
+import com.csg.oniontrading.flow.BuyerStore;
 import kotlin.jvm.JvmClassMappingKt;
 import net.corda.core.node.PluginServiceHub;
 
@@ -14,17 +15,17 @@ import net.corda.core.node.PluginServiceHub;
  * mapping then the session attempt is rejected.
  *
  * In short, this bit of code is required for the seller in this Example scenario to repond to the buyer using the
- * [ExampleFlow.Acceptor] flow.
+ * [ExampleFlow.BuyerStore] flow.
  */
 public class ExampleService {
     public ExampleService(PluginServiceHub services) {
         services.registerFlowInitiator(
-                JvmClassMappingKt.getKotlinClass(TradingFlow.IssueAndSendToRiskManager.class),
-                TradingFlow.RiskManagerTradingStore::new
+                JvmClassMappingKt.getKotlinClass(IssueAndSendToRiskManager.class),
+                IssuerRiskManagerTradingStore::new
         );
         services.registerFlowInitiator(
-                JvmClassMappingKt.getKotlinClass(TradingFlow.RiskManagerApprove.class),
-                TradingFlow.Acceptor::new
+                JvmClassMappingKt.getKotlinClass(IssuerRiskManagerApprove.class),
+                BuyerStore::new
         );
     }
 }

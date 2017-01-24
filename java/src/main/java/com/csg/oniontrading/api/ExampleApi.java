@@ -1,15 +1,10 @@
 package com.csg.oniontrading.api;
 
 import com.csg.oniontrading.contract.*;
-import com.csg.oniontrading.flow.ExampleFlow;
-import com.csg.oniontrading.flow.TradingFlow;
-import com.csg.oniontrading.model.PurchaseOrder;
-import com.csg.oniontrading.contract.PurchaseOrderContract;
-import com.csg.oniontrading.contract.PurchaseOrderState;
-import com.csg.oniontrading.flow.ExampleFlow;
-import com.csg.oniontrading.model.PurchaseOrder;
+import com.csg.oniontrading.flow.IssueAndSendToRiskManager;
+import com.csg.oniontrading.flow.IssuerRiskManagerApprove;
+import com.csg.oniontrading.flow.TradingFlowResult;
 import com.csg.oniontrading.model.TradingOrder;
-import com.sun.org.apache.regexp.internal.RE;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.crypto.Party;
@@ -93,14 +88,14 @@ public class ExampleApi {
         }
 
         // The line below blocks and waits for the flow to return.
-        final TradingFlow.TradingFlowResult result = services
-                .startFlowDynamic(TradingFlow.IssueAndSendToRiskManager.class, tradingState, otherParty)
+        final TradingFlowResult result = services
+                .startFlowDynamic(IssueAndSendToRiskManager.class, tradingState, otherParty)
                 .getReturnValue()
                 .toBlocking()
                 .first();
 
         final Response.Status status;
-        if (result instanceof TradingFlow.TradingFlowResult.Success) {
+        if (result instanceof TradingFlowResult.Success) {
             status = Response.Status.CREATED;
         } else {
             status = Response.Status.BAD_REQUEST;
@@ -119,14 +114,14 @@ public class ExampleApi {
     public Response approveTrade(@PathParam("tradeId")String tradeId){
         TradingState tradingState = find(tradeId);
 
-        TradingFlow.TradingFlowResult result = services
-                .startFlowDynamic(TradingFlow.RiskManagerApprove.class, tradingState)
+        TradingFlowResult result = services
+                .startFlowDynamic(IssuerRiskManagerApprove.class, tradingState)
                 .getReturnValue()
                 .toBlocking()
                 .first();
 
         final Response.Status status;
-        if (result instanceof TradingFlow.TradingFlowResult.Success) {
+        if (result instanceof TradingFlowResult.Success) {
             status = Response.Status.CREATED;
         } else {
             status = Response.Status.BAD_REQUEST;

@@ -1,18 +1,14 @@
 package com.csg.oniontrading.plugin;
 
 import com.csg.oniontrading.api.ExampleApi;
-import com.csg.oniontrading.contract.PurchaseOrderContract;
 import com.csg.oniontrading.contract.PurchaseOrderState;
-import com.csg.oniontrading.contract.TradingContract;
 import com.csg.oniontrading.contract.TradingState;
 import com.csg.oniontrading.flow.ExampleFlow;
-import com.csg.oniontrading.flow.TradingFlow;
-import com.csg.oniontrading.model.PurchaseOrder;
-import com.csg.oniontrading.model.TradingOrder;
+import com.csg.oniontrading.flow.IssueAndSendToRiskManager;
+import com.csg.oniontrading.flow.IssuerRiskManagerApprove;
 import com.csg.oniontrading.service.ExampleService;
 import com.esotericsoftware.kryo.Kryo;
 import net.corda.core.crypto.Party;
-import net.corda.core.flows.IllegalFlowLogicException;
 import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.node.CordaPluginRegistry;
 import net.corda.core.node.PluginServiceHub;
@@ -49,12 +45,12 @@ public class ExamplePlugin extends CordaPluginRegistry {
                         PurchaseOrderState.class.getName(),
                         Party.class.getName()
                 )));
-        requiredFlows.put(TradingFlow.IssueAndSendToRiskManager.class.getName(),
+        requiredFlows.put(IssueAndSendToRiskManager.class.getName(),
                 new HashSet<>(Arrays.asList(
                         TradingState.class.getName(),
                         Party.class.getName()
                 )));
-        requiredFlows.put(TradingFlow.RiskManagerApprove.class.getName(),
+        requiredFlows.put(IssuerRiskManagerApprove.class.getName(),
                 new HashSet<>(Arrays.asList(
                         TradingState.class.getName()
                 )));
