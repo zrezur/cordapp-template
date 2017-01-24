@@ -20,12 +20,14 @@ public class ApprovedTradingState implements DealState{
     private String approverName;
     private final Party issuer;
     private final Party approver;
+    private final Party buyer;
     private UniqueIdentifier linearId;
     private final TradingContract contract;
 
-    public ApprovedTradingState(String approverName, Party issuer, Party approver, TradingContract contract) {
+    public ApprovedTradingState(String approverName, Party issuer, Party approver, Party buyer, TradingContract contract) {
         this.approverName = approverName;
         this.issuer = issuer;
+        this.buyer = buyer;
         this.approver = approver;
         this.contract = contract;
         this.linearId = new UniqueIdentifier(UUID.randomUUID().toString(), UUID.randomUUID());
@@ -41,7 +43,7 @@ public class ApprovedTradingState implements DealState{
                 .withItems(this, new Command(new TradingContract.Commands.Approve(), getParticipants()));
     }
 
-    @Override public List<Party> getParties() { return Arrays.asList(issuer, approver); }
+    @Override public List<Party> getParties() { return Arrays.asList(issuer, approver, buyer); }
 
     @Override public String getRef() { return linearId.getExternalId(); }
 

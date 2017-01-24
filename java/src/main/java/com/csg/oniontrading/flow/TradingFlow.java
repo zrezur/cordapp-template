@@ -5,6 +5,7 @@ import com.csg.oniontrading.contract.ApprovedTradingState;
 import com.csg.oniontrading.contract.TradingState;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.DealState;
+import net.corda.core.contracts.StateRef;
 import net.corda.core.contracts.TransactionState;
 import net.corda.core.crypto.Party;
 import net.corda.core.flows.FlowLogic;
@@ -197,15 +198,17 @@ public class TradingFlow {
             ApprovedTradingState approvedTradingState = new ApprovedTradingState(approverName,
                     tradingState.getSeller(),
                     getServiceHub().getMyInfo().getLegalIdentity(),
+                    tradingState.getBuyer(),
                     tradingState.getContract());
 
             TransactionBuilder utx = approvedTradingState.generateAgreement(notary);
+            utx.withItems(tradingState);
             utx.signWith(keyPair);
             SignedTransaction signedTransaction = utx.toSignedTransaction(false);
 
             send(tradingState.getBuyer(), signedTransaction);
 
-            return new TradingFlowResult.Success(String.format("Transaction id %s committed to ledger.", signedTransaction.getId()));
+            return new TradingFlowResult.Success(String.format("Transaction id %s approved send to to buyer.", signedTransaction.getId()));
         }
 
         private boolean checkRisk(TradingState tradingState) {
@@ -255,13 +258,17 @@ public class TradingFlow {
                 progressTracker.setCurrentStep(WAIT_FOR_AND_RECEIVE_PROPOSAL);
                 // All messages come off the wire as UntrustworthyData. You need to 'unwrap' it. This is an appropriate
                 // place to perform some validation over what you have just received.
-//                final SignedTransaction message = this.receive(SignedTransaction.class, otherParty)
-//                        .unwrap(data -> (TransactionState<DealState>) data );
+                final SignedTransaction message = this.receive(SignedTransaction.class, otherParty)
+                        .unwrap(data -> data);
 //
+//                StateRef stateRef = message.getTx().getInputs().get(0);
+//                TransactionState<?> transactionState = getServiceHub().loadState(stateRef);
+//                System.out.println(transactionState);
 //                DealState data = message.getData();
 //                System.out.println(data);
 
-                return new TradingFlowResult.Success(String.format("Transaction id %s committed to ledger.", 123));
+                getServiceHub().recordTransactions(Collections.singleton(message));
+                return new TradingFlowResult.Success(String.format("Transaction %s stored to approve.", message.getId()));
             } catch (Exception ex) {
                 return new TradingFlowResult.Failure(ex.getMessage());
             }
