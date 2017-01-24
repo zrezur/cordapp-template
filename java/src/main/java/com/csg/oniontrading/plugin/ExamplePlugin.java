@@ -54,6 +54,10 @@ public class ExamplePlugin extends CordaPluginRegistry {
                         TradingState.class.getName(),
                         Party.class.getName()
                 )));
+        requiredFlows.put(TradingFlow.RiskManagerApprove.class.getName(),
+                new HashSet<>(Arrays.asList(
+                        TradingState.class.getName()
+                )));
     }
 
     /**

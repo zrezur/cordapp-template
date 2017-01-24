@@ -9,6 +9,7 @@ import com.csg.oniontrading.contract.PurchaseOrderState;
 import com.csg.oniontrading.flow.ExampleFlow;
 import com.csg.oniontrading.model.PurchaseOrder;
 import com.csg.oniontrading.model.TradingOrder;
+import com.sun.org.apache.regexp.internal.RE;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.crypto.Party;
@@ -73,7 +74,7 @@ public class ExampleApi {
 
 
     @PUT
-    @Path("${party}/create-trade-order")
+    @Path("{party}/create-trade-order")
     public Response createTradeOrder(TradingOrder order, @PathParam("party") String partyName) throws InterruptedException, ExecutionException {
         final Party otherParty = services.partyFromName(partyName);
 
@@ -105,5 +106,40 @@ public class ExampleApi {
                 .status(status)
                 .entity(result.toString())
                 .build();
+    }
+
+    @POST
+    @Path("/approve-trade/{tradeId}")
+    public Response approveTrade(@PathParam("tradeId")String tradeId){
+        TradingState tradingState = find(tradeId);
+
+        TradingFlow.TradingFlowResult result = services
+                .startFlowDynamic(TradingFlow.RiskManagerApprove.class, tradingState)
+                .getReturnValue()
+                .toBlocking()
+                .first();
+
+        final Response.Status status;
+        if (result instanceof TradingFlow.TradingFlowResult.Success) {
+            status = Response.Status.CREATED;
+        } else {
+            status = Response.Status.BAD_REQUEST;
+        }
+
+        return Response
+                .status(status)
+                .entity(result.toString())
+                .build();
+    }
+
+    private TradingState find(@PathParam("tradeId") String tradeId) {
+        for (StateAndRef<ContractState> ref : services.vaultAndUpdates().getFirst()) {
+            ContractState contractState = ref.component1().getData();
+            TradingState tradingState = (TradingState) contractState;
+            if(tradingState.getTradingOrder().getOrderId().equalsIgnoreCase(tradeId)){
+                return tradingState;
+            }
+        }
+        throw new RuntimeException("Can not find trade " + tradeId);
     }
 }
