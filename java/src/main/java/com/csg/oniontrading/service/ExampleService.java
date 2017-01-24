@@ -1,9 +1,6 @@
 package com.csg.oniontrading.service;
 
-import com.csg.oniontrading.flow.IssueAndSendToRiskManager;
-import com.csg.oniontrading.flow.IssuerRiskManagerApprove;
-import com.csg.oniontrading.flow.IssuerRiskManagerTradingStore;
-import com.csg.oniontrading.flow.BuyerStore;
+import com.csg.oniontrading.flow.*;
 import kotlin.jvm.JvmClassMappingKt;
 import net.corda.core.node.PluginServiceHub;
 
@@ -21,11 +18,15 @@ public class ExampleService {
     public ExampleService(PluginServiceHub services) {
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(IssueAndSendToRiskManager.class),
-                IssuerRiskManagerTradingStore::new
+                RiskManagerTradingStore::new
         );
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(IssuerRiskManagerApprove.class),
                 BuyerStore::new
+        );
+        services.registerFlowInitiator(
+                JvmClassMappingKt.getKotlinClass(BuyerApproveAndSendToRiskManager.class),
+                RiskManagerTradingStore::new
         );
     }
 }

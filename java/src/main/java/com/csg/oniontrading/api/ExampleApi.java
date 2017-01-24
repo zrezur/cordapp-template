@@ -1,6 +1,7 @@
 package com.csg.oniontrading.api;
 
 import com.csg.oniontrading.contract.*;
+import com.csg.oniontrading.flow.BuyerApproveAndSendToRiskManager;
 import com.csg.oniontrading.flow.IssueAndSendToRiskManager;
 import com.csg.oniontrading.flow.IssuerRiskManagerApprove;
 import com.csg.oniontrading.flow.TradingFlowResult;
@@ -114,11 +115,21 @@ public class ExampleApi {
     public Response approveTrade(@PathParam("tradeId")String tradeId){
         TradingState tradingState = find(tradeId);
 
-        TradingFlowResult result = services
-                .startFlowDynamic(IssuerRiskManagerApprove.class, tradingState)
-                .getReturnValue()
-                .toBlocking()
-                .first();
+        TradingFlowResult result = null;
+        if(isRiskManagerOf(myLegalName)) {
+            result = services
+                    .startFlowDynamic(IssuerRiskManagerApprove.class, tradingState)
+                    .getReturnValue()
+                    .toBlocking()
+                    .first();
+        }
+        else if(myLegalName.equals(tradingState.getBuyer().getName())) {
+            result = services
+                    .startFlowDynamic(BuyerApproveAndSendToRiskManager.class, tradingState)
+                    .getReturnValue()
+                    .toBlocking()
+                    .first();
+        }
 
         final Response.Status status;
         if (result instanceof TradingFlowResult.Success) {
@@ -131,6 +142,17 @@ public class ExampleApi {
                 .status(status)
                 .entity(result.toString())
                 .build();
+    }
+
+    private boolean isRiskManagerOf(String legalName) {
+        if(legalName.startsWith("Node")){
+            String bankId = myLegalName.substring("Node".length());
+            return myLegalName.startsWith("RiskManager") && myLegalName.endsWith(bankId);
+        }
+        else{
+            return false;
+        }
+
     }
 
     private TradingState find(@PathParam("tradeId") String tradeId) {

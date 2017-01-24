@@ -19,16 +19,18 @@ public class ApprovedTradingState implements DealState{
 
     private String approverName;
     private final Party issuer;
-    private final Party approver;
+    private final Party issuerApprover;
+    private final Party buyerApprover;
     private final Party buyer;
     private UniqueIdentifier linearId;
     private final TradingContract contract;
 
-    public ApprovedTradingState(String approverName, Party issuer, Party approver, Party buyer, TradingContract contract) {
+    public ApprovedTradingState(String approverName, Party issuer, Party approver, Party buyer, Party buyerApprover, TradingContract contract) {
         this.approverName = approverName;
         this.issuer = issuer;
         this.buyer = buyer;
-        this.approver = approver;
+        this.issuerApprover = approver;
+        this.buyerApprover = buyerApprover;
         this.contract = contract;
         this.linearId = new UniqueIdentifier(UUID.randomUUID().toString(), UUID.randomUUID());
     }
@@ -43,7 +45,7 @@ public class ApprovedTradingState implements DealState{
                 .withItems(this, new Command(new TradingContract.Commands.Approve(), getParticipants()));
     }
 
-    @Override public List<Party> getParties() { return Arrays.asList(issuer, approver, buyer); }
+    @Override public List<Party> getParties() { return Arrays.asList(issuer, issuerApprover, buyer, buyerApprover); }
 
     @Override public String getRef() { return linearId.getExternalId(); }
 
@@ -77,5 +79,21 @@ public class ApprovedTradingState implements DealState{
                 .stream()
                 .map(Party::getOwningKey)
                 .collect(toList());
+    }
+
+    public String getApproverName() {
+        return approverName;
+    }
+
+    public Party getIssuer() {
+        return issuer;
+    }
+
+    public Party getIssuerApprover() {
+        return issuerApprover;
+    }
+
+    public Party getBuyer() {
+        return buyer;
     }
 }
