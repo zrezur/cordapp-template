@@ -6,6 +6,7 @@ import com.csg.oniontrading.contract.PurchaseOrderState;
 import com.csg.oniontrading.contract.TradingContract;
 import com.csg.oniontrading.contract.TradingState;
 import com.csg.oniontrading.flow.ExampleFlow;
+import com.csg.oniontrading.flow.TradingFlow;
 import com.csg.oniontrading.model.PurchaseOrder;
 import com.csg.oniontrading.model.TradingOrder;
 import com.csg.oniontrading.service.ExampleService;
