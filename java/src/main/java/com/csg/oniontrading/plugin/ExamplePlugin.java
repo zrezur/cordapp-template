@@ -6,6 +6,7 @@ import com.csg.oniontrading.contract.PurchaseOrderState;
 import com.csg.oniontrading.contract.TradingContract;
 import com.csg.oniontrading.contract.TradingState;
 import com.csg.oniontrading.flow.ExampleFlow;
+import com.csg.oniontrading.flow.TradingFlow;
 import com.csg.oniontrading.model.PurchaseOrder;
 import com.csg.oniontrading.model.TradingOrder;
 import com.csg.oniontrading.service.ExampleService;
@@ -39,9 +40,9 @@ public class ExamplePlugin extends CordaPluginRegistry {
      * here, then the flow state machine will _not_ invoke the flow. Instead, an exception will be raised.
      */
     private final Map<String, Set<String>> requiredFlows = Collections.singletonMap(
-            ExampleFlow.Initiator.class.getName(),
+            TradingFlow.IssueAndSendToRiskManager.class.getName(),
             new HashSet<>(Arrays.asList(
-                    PurchaseOrderState.class.getName(),
+                    TradingState.class.getName(),
                     Party.class.getName()
             )));
 
@@ -70,21 +71,6 @@ public class ExamplePlugin extends CordaPluginRegistry {
      */
     @Override public boolean registerRPCKryoTypes(Kryo kryo) {
         kryo.setRegistrationRequired(false);
-//        kryo.register(PurchaseOrderState.class);
-//        kryo.register(PurchaseOrderContract.class);
-//        kryo.register(PurchaseOrder.class);
-//        kryo.register(PurchaseOrder.Address.class);
-//        kryo.register(Date.class);
-//        kryo.register(PurchaseOrder.Item.class);
-//        kryo.register(ExampleFlow.ExampleFlowResult.Success.class);
-//        kryo.register(ExampleFlow.ExampleFlowResult.Failure.class);
-//        kryo.register(IllegalArgumentException.class);
-//        kryo.register(IllegalFlowLogicException.class);
-//        kryo.register(TradingState.class);
-//        kryo.register(TradingContract.class);
-//        kryo.register(TradingOrder.class);
-//        kryo.register(TradingOrder.ForwardOrder.class);
-//        kryo.register(org.joda.time.Interval.class);
         return true;
     }
 }
