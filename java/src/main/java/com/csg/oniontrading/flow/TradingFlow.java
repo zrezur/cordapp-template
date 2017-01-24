@@ -1,6 +1,7 @@
 package com.csg.oniontrading.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
+import com.csg.oniontrading.contract.ApprovedTradingState;
 import com.csg.oniontrading.contract.TradingState;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.DealState;
@@ -15,6 +16,7 @@ import net.corda.core.transactions.TransactionBuilder;
 import net.corda.core.transactions.WireTransaction;
 import net.corda.core.utilities.ProgressTracker;
 import net.corda.flows.NotaryFlow;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.security.KeyPair;
 import java.time.Duration;
@@ -26,7 +28,7 @@ import static kotlin.collections.CollectionsKt.single;
 /**
  * This is the "Hello World" of flows!
  *
- * It is a generic flow which facilitates the workflow required for two parties; an [Initiator] and an [Acceptor],
+ * It is a generic flow which facilitates the workflow required for two parties; an [IssueAndSendToRiskManager] and an [Acceptor],
  * to come to an agreement about some arbitrary data (in this case, a [PurchaseOrder]) encapsulated within a [DealState].
  *
  * As this is just an example there's no way to handle any counter-proposals. The [Acceptor] always accepts the
@@ -42,7 +44,13 @@ import static kotlin.collections.CollectionsKt.single;
  * explains each stage of the flow.
  */
 public class TradingFlow {
-    public static class Initiator extends FlowLogic<TradingFlowResult> {
+
+    public static final String NAME_NODE_A = "NodeA";
+    public static final String NAME_NODE_B = "NodeB";
+    public static final String NAME_RISK_MANAGER_A = "RiskManagerA";
+    public static final String NAME_RISK_MANAGER_B = "RiskManagerB";
+
+    public static class IssueAndSendToRiskManager extends FlowLogic<TradingFlowResult> {
 
         private final TradingState tradingState;
         private final Party otherParty;
@@ -77,7 +85,7 @@ public class TradingFlow {
         private static final ProgressTracker.Step SENDING_FINAL_TRANSACTION = new ProgressTracker.Step(
                 "Sending fully signed transaction to seller.");
 
-        public Initiator(TradingState tradingState, Party otherParty) {
+        public IssueAndSendToRiskManager(TradingState tradingState, Party otherParty) {
             this.tradingState = tradingState;
             this.otherParty = otherParty;
         }
@@ -109,65 +117,115 @@ public class TradingFlow {
 
                 // Stage 2.
                 progressTracker.setCurrentStep(APPROVAL);
-                sendForApprovalByRiskManager(tradingState);
+                Party riskManagerParty = getRiskManagerParty(getServiceHub().getMyInfo().getLegalIdentity());
+                send(riskManagerParty, offerMessage);
 
                 // Stage 3.
-                progressTracker.setCurrentStep(SENDING_OFFER_AND_RECEIVING_PARTIAL_TRANSACTION);
-                // Send the state across the wire to the designated counterparty.
-                // -----------------------
-                // Flow jumps to Acceptor.
-                // -----------------------
-                // Receive the partially signed transaction off the wire from the other party.
-                final SignedTransaction ptx = sendAndReceive(SignedTransaction.class, otherParty, offerMessage)
-                        .unwrap(data -> data);
-
-                // Stage 7.
-                progressTracker.setCurrentStep(VERIFYING);
-                // Check that the signature of the other party is valid.
-                // Our signature and the Notary's signature are allowed to be omitted at this stage as this is only a
-                // partially signed transaction.
-                final WireTransaction wtx = ptx.verifySignatures(CryptoUtilities.getComposite(myKeyPair.getPublic()), notaryPubKey);
-                // Run the contract's verify function.
-                // We want to be sure that the PurchaseOrderState agreed upon is a valid instance of an PurchaseOrderContract, to do
-                // this we need to run the contract's verify() function.
-                wtx.toLedgerTransaction(getServiceHub()).verify();
-
-                // Stage 8.
-                progressTracker.setCurrentStep(SIGNING);
-                // Sign the transaction with our key pair and add it to the transaction.
-                // We now have 'validation consensus'. We still require uniqueness consensus.
-                // Technically validation consensus for this type of agreement implicitly provides uniqueness consensus.
-                final DigitalSignature.WithKey mySig = CryptoUtilities.signWithECDSA(myKeyPair, ptx.getId().getBytes());
-                final SignedTransaction vtx = ptx.plus(mySig);
-
-                // Stage 9.
-                progressTracker.setCurrentStep(NOTARY);
-                // Obtain the notary's signature.
-                // We do this by firing-off a sub-flow. This illustrates the power of protocols as reusable workflows.
-                final DigitalSignature.WithKey notarySignature = subFlow(new NotaryFlow.Client(vtx, NotaryFlow.Client.Companion.tracker()), false);
-                // Add the notary signature to the transaction.
-                final SignedTransaction ntx = vtx.plus(notarySignature);
-
-                // Stage 10.
-                progressTracker.setCurrentStep(RECORDING);
-                // Record the transaction in our vault.
-                getServiceHub().recordTransactions(Collections.singletonList(ntx));
-
-                // Stage 11.
-                progressTracker.setCurrentStep(SENDING_FINAL_TRANSACTION);
-                // Send a copy of the transaction to our counter-party.
-                send(otherParty, ntx);
-                return new TradingFlowResult.Success(String.format("Transaction id %s committed to ledger.", ntx.getId()));
+                return new TradingFlowResult.Success(String.format("Transaction passed to Risk manager."));
             } catch(Exception ex) {
                 // Just catch all exception types.
                 return new TradingFlowResult.Failure(ex.getMessage());
             }
         }
 
-        private void sendForApprovalByRiskManager(TradingState tradingState) {
-            //TODO how to validate transaction by manager
-            //TODO how to block flow till approval
+        public Party getRiskManagerParty(Party source) {
+            if(source.getName().equalsIgnoreCase(NAME_NODE_A)){
 
+                return getServiceHub().getNetworkMapCache().getNodeByLegalName(NAME_RISK_MANAGER_A).getLegalIdentity();
+            }
+            else if(source.getName().equalsIgnoreCase(NAME_NODE_B)){
+                return getServiceHub().getNetworkMapCache().getNodeByLegalName(NAME_RISK_MANAGER_B).getLegalIdentity();
+            }
+            else {
+                throw new RuntimeException("Unknown party "+ source.getName());
+            }
+        }
+    }
+
+    public static class RiskManagerTradingStore extends FlowLogic<TradingFlowResult> {
+
+        private final Party issuer;
+
+        public RiskManagerTradingStore (Party issuer) {
+            this.issuer = issuer;
+        }
+
+        private final ProgressTracker progressTracker = new ProgressTracker(
+                RECORDING
+        );
+
+        private static final ProgressTracker.Step RECORDING = new ProgressTracker.Step(
+                "Recording transaction in vault.");
+
+        @Override
+        public TradingFlowResult call() {
+            // Prep.
+            // Obtain a reference to our key pair.
+            final KeyPair keyPair = getServiceHub().getLegalIdentityKey();
+
+            // Stage 1.
+            progressTracker.setCurrentStep(RECORDING);
+
+            final TransactionState<DealState> message = this.receive(TransactionState.class, issuer)
+                    .unwrap(data -> (TransactionState<DealState>) data );
+
+            TransactionBuilder utx = message.getData().generateAgreement(message.getNotary());
+
+            final SignedTransaction stx = utx.signWith(keyPair).toSignedTransaction(false);
+
+            getServiceHub().recordTransactions(Collections.singletonList(stx));
+            return new TradingFlowResult.Success(String.format("Transaction id %s committed to ledger.", stx.getId()));
+        }
+    }
+
+    public static class RiskManagerApproval extends FlowLogic<TradingFlowResult> {
+
+
+        public static final boolean APPROVED = true;
+        private ApprovedTradingState approvedTradingState;
+        private final Party otherParty;
+
+        public RiskManagerApproval(ApprovedTradingState approvedTradingState, Party otherParty) {
+            this.approvedTradingState = approvedTradingState;
+            this.otherParty = otherParty;
+        }
+
+        private ProgressTracker progressTracker = new ProgressTracker(
+                WAIT_FOR_AND_RECEIVE_PROPOSAL,
+                SIGNING,
+                SEND_TRANSACTION
+                );
+
+        private static final ProgressTracker.Step WAIT_FOR_AND_RECEIVE_PROPOSAL = new ProgressTracker.Step(
+                "Receiving proposed purchase order from buyer.");
+        private static final ProgressTracker.Step SIGNING = new ProgressTracker.Step(
+                "Signing proposed transaction with our private key.");
+        private static final ProgressTracker.Step SEND_TRANSACTION = new ProgressTracker.Step(
+                "Sending transaction to other party.");
+
+        @Override public ProgressTracker getProgressTracker() { return progressTracker; }
+
+        @Override
+        public TradingFlowResult call() {
+            try{
+                // Prep.
+                // Obtain a reference to our key pair.
+                final KeyPair keyPair = getServiceHub().getLegalIdentityKey();
+
+
+
+                // Stage 2.
+                progressTracker.setCurrentStep(WAIT_FOR_AND_RECEIVE_PROPOSAL);
+                // All messages come off the wire as UntrustworthyData. You need to 'unwrap' it. This is an appropriate
+                // place to perform some validation over what you have just received.
+                final TransactionState<DealState> message = this.receive(TransactionState.class, otherParty)
+                        .unwrap(data -> (TransactionState<DealState>) data );
+
+
+            } catch (Exception ex) {
+                return new TradingFlowResult.Failure(ex.getMessage());
+            }
+            throw new NotImplementedException();
         }
     }
 
@@ -235,7 +293,7 @@ public class TradingFlow {
                 progressTracker.setCurrentStep(SEND_TRANSACTION_AND_WAIT_FOR_RESPONSE);
                 // Send the state back across the wire to the designated counterparty.
                 // ------------------------
-                // Flow jumps to Initiator.
+                // Flow jumps to IssueAndSendToRiskManager.
                 // ------------------------
                 // Receive the signed transaction off the wire from the other party.
                 final SignedTransaction ntx = this.sendAndReceive(SignedTransaction.class, otherParty, stx)

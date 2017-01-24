@@ -1,15 +1,15 @@
 package com.csg.oniontrading.plugin;
 
-import com.csg.oniontrading.contract.PurchaseOrderContract;
-import com.csg.oniontrading.contract.PurchaseOrderState;
-import com.csg.oniontrading.flow.ExampleFlow;
-import com.esotericsoftware.kryo.Kryo;
 import com.csg.oniontrading.api.ExampleApi;
 import com.csg.oniontrading.contract.PurchaseOrderContract;
 import com.csg.oniontrading.contract.PurchaseOrderState;
+import com.csg.oniontrading.contract.TradingContract;
+import com.csg.oniontrading.contract.TradingState;
 import com.csg.oniontrading.flow.ExampleFlow;
 import com.csg.oniontrading.model.PurchaseOrder;
+import com.csg.oniontrading.model.TradingOrder;
 import com.csg.oniontrading.service.ExampleService;
+import com.esotericsoftware.kryo.Kryo;
 import net.corda.core.crypto.Party;
 import net.corda.core.flows.IllegalFlowLogicException;
 import net.corda.core.messaging.CordaRPCOps;
@@ -33,7 +33,7 @@ public class ExamplePlugin extends CordaPluginRegistry {
      *
      * E.g. In the case of this CorDapp:
      *
-     * "ExampleFlow.Initiator" -> Set(PurchaseOrderState, Party)
+     * "ExampleFlow.IssueAndSendToRiskManager" -> Set(PurchaseOrderState, Party)
      *
      * This map also acts as a white list. If a flow is invoked via the API and not registered correctly
      * here, then the flow state machine will _not_ invoke the flow. Instead, an exception will be raised.
@@ -69,16 +69,22 @@ public class ExamplePlugin extends CordaPluginRegistry {
      * Register required types with Kryo (our serialisation framework).
      */
     @Override public boolean registerRPCKryoTypes(Kryo kryo) {
-        kryo.register(PurchaseOrderState.class);
-        kryo.register(PurchaseOrderContract.class);
-        kryo.register(PurchaseOrder.class);
-        kryo.register(PurchaseOrder.Address.class);
-        kryo.register(Date.class);
-        kryo.register(PurchaseOrder.Item.class);
-        kryo.register(ExampleFlow.ExampleFlowResult.Success.class);
-        kryo.register(ExampleFlow.ExampleFlowResult.Failure.class);
-        kryo.register(IllegalArgumentException.class);
-        kryo.register(IllegalFlowLogicException.class);
+        kryo.setRegistrationRequired(false);
+//        kryo.register(PurchaseOrderState.class);
+//        kryo.register(PurchaseOrderContract.class);
+//        kryo.register(PurchaseOrder.class);
+//        kryo.register(PurchaseOrder.Address.class);
+//        kryo.register(Date.class);
+//        kryo.register(PurchaseOrder.Item.class);
+//        kryo.register(ExampleFlow.ExampleFlowResult.Success.class);
+//        kryo.register(ExampleFlow.ExampleFlowResult.Failure.class);
+//        kryo.register(IllegalArgumentException.class);
+//        kryo.register(IllegalFlowLogicException.class);
+//        kryo.register(TradingState.class);
+//        kryo.register(TradingContract.class);
+//        kryo.register(TradingOrder.class);
+//        kryo.register(TradingOrder.ForwardOrder.class);
+//        kryo.register(org.joda.time.Interval.class);
         return true;
     }
 }

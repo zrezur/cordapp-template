@@ -1,13 +1,14 @@
 package com.csg.oniontrading.api;
 
-import com.csg.oniontrading.contract.PurchaseOrderContract;
-import com.csg.oniontrading.contract.PurchaseOrderState;
+import com.csg.oniontrading.contract.*;
 import com.csg.oniontrading.flow.ExampleFlow;
+import com.csg.oniontrading.flow.TradingFlow;
 import com.csg.oniontrading.model.PurchaseOrder;
 import com.csg.oniontrading.contract.PurchaseOrderContract;
 import com.csg.oniontrading.contract.PurchaseOrderState;
 import com.csg.oniontrading.flow.ExampleFlow;
 import com.csg.oniontrading.model.PurchaseOrder;
+import com.csg.oniontrading.model.TradingOrder;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.crypto.Party;
@@ -104,6 +105,43 @@ public class ExampleApi {
 
         final Response.Status status;
         if (result instanceof ExampleFlow.ExampleFlowResult.Success) {
+            status = Response.Status.CREATED;
+        } else {
+            status = Response.Status.BAD_REQUEST;
+        }
+
+        return Response
+                .status(status)
+                .entity(result.toString())
+                .build();
+    }
+
+    @GET
+    @Path("/create-trade-order")
+    public Response createPurchaseOrder() throws InterruptedException, ExecutionException {
+        final Party otherParty = services.partyFromName("NodeB");
+        TradingOrder.ForwardOrder tradingOrder = new TradingOrder.ForwardOrder();
+        tradingOrder.setNominal(10000);
+
+        TradingState tradingState = new TradingState(tradingOrder,
+                services.nodeIdentity().getLegalIdentity(),
+                otherParty,
+                new TradingContract()
+        );
+
+        if (otherParty == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        // The line below blocks and waits for the flow to return.
+        final TradingFlow.TradingFlowResult result = services
+                .startFlowDynamic(TradingFlow.IssueAndSendToRiskManager.class, tradingState, otherParty)
+                .getReturnValue()
+                .toBlocking()
+                .first();
+
+        final Response.Status status;
+        if (result instanceof TradingFlow.TradingFlowResult.Success) {
             status = Response.Status.CREATED;
         } else {
             status = Response.Status.BAD_REQUEST;

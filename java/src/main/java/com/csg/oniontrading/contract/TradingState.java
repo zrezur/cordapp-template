@@ -20,11 +20,13 @@ public class TradingState implements DealState {
     private final Party seller;
     private final TradingContract contract;
     private final UniqueIdentifier linearId;
+//    private final boolean approved;
 
     public TradingState(TradingOrder tradingOrder,
                               Party buyer,
                               Party seller,
-                              TradingContract contract)
+                              TradingContract contract
+                        )
     {
         this.tradingOrder = tradingOrder;
         this.buyer = buyer;
@@ -45,6 +47,10 @@ public class TradingState implements DealState {
                 .stream()
                 .map(Party::getOwningKey)
                 .collect(toList());
+    }
+
+    public TradingOrder getTradingOrder() {
+        return tradingOrder;
     }
 
     /**

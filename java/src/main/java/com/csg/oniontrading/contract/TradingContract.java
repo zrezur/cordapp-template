@@ -40,6 +40,11 @@ public class TradingContract implements Contract {
             private final long nonce = Utils.random63BitValue();
             @Override public long getNonce() { return nonce; }
         }
+
+        class Approve implements IssueCommand, TradingContract.Commands{
+            private final long nonce = Utils.random63BitValue();
+            @Override public long getNonce() { return nonce; }
+        }
     }
 
     public interface Clauses {

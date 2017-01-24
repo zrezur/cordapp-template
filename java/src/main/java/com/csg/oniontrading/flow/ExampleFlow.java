@@ -27,7 +27,7 @@ import static kotlin.collections.CollectionsKt.single;
 /**
  * This is the "Hello World" of flows!
  *
- * It is a generic flow which facilitates the workflow required for two parties; an [Initiator] and an [Acceptor],
+ * It is a generic flow which facilitates the workflow required for two parties; an [IssueAndSendToRiskManager] and an [Acceptor],
  * to come to an agreement about some arbitrary data (in this case, a [PurchaseOrder]) encapsulated within a [DealState].
  *
  * As this is just an example there's no way to handle any counter-proposals. The [Acceptor] always accepts the
@@ -223,7 +223,7 @@ public class ExampleFlow {
                 progressTracker.setCurrentStep(SEND_TRANSACTION_AND_WAIT_FOR_RESPONSE);
                 // Send the state back across the wire to the designated counterparty.
                 // ------------------------
-                // Flow jumps to Initiator.
+                // Flow jumps to IssueAndSendToRiskManager.
                 // ------------------------
                 // Receive the signed transaction off the wire from the other party.
                 final SignedTransaction ntx = this.sendAndReceive(SignedTransaction.class, otherParty, stx)

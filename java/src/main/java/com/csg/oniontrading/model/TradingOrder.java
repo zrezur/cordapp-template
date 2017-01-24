@@ -19,11 +19,11 @@ public class TradingOrder {
 
     public static class ForwardOrder extends  TradingOrder {
 
-        public Pair getPair() {
+        public String getPair() {
             return pair;
         }
 
-        public void setPair(Pair pair) {
+        public void setPair(String pair) {
             this.pair = pair;
         }
 
@@ -43,14 +43,10 @@ public class TradingOrder {
             this.tenor = tenor;
         }
 
-        private Pair pair;
+        private String  pair;
         private Integer nominal;
         private Interval tenor;
 
-        public  enum Pair {
-            EURUSD,
-            EURCHF,
-            USDCHF;
-        }
+
     }
 }
