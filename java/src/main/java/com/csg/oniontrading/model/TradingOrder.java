@@ -1,13 +1,12 @@
 package com.csg.oniontrading.model;
 
-import org.joda.time.Interval;
-
 import java.util.UUID;
 
 public class TradingOrder {
-
     private final String orderId;
-
+    private String pair;
+    private Integer nominal;
+    private String tenor;
 
     public TradingOrder() {
         this.orderId = UUID.randomUUID().toString();
@@ -17,36 +16,27 @@ public class TradingOrder {
         return orderId;
     }
 
-    public static class ForwardOrder extends  TradingOrder {
+    public String getPair() {
+        return pair;
+    }
 
-        public String getPair() {
-            return pair;
-        }
+    public void setPair(String pair) {
+        this.pair = pair;
+    }
 
-        public void setPair(String pair) {
-            this.pair = pair;
-        }
+    public Integer getNominal() {
+        return nominal;
+    }
 
-        public Integer getNominal() {
-            return nominal;
-        }
+    public void setNominal(Integer nominal) {
+        this.nominal = nominal;
+    }
 
-        public void setNominal(Integer nominal) {
-            this.nominal = nominal;
-        }
+    public String getTenor() {
+        return tenor;
+    }
 
-        public Interval getTenor() {
-            return tenor;
-        }
-
-        public void setTenor(Interval tenor) {
-            this.tenor = tenor;
-        }
-
-        private String  pair;
-        private Integer nominal;
-        private Interval tenor;
-
-
+    public void setTenor(String tenor) {
+        this.tenor = tenor;
     }
 }

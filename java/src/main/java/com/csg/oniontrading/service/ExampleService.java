@@ -2,6 +2,7 @@ package com.csg.oniontrading.service;
 
 import com.csg.oniontrading.flow.ExampleFlow;
 import com.csg.oniontrading.flow.ExampleFlow;
+import com.csg.oniontrading.flow.TradingFlow;
 import kotlin.jvm.JvmClassMappingKt;
 import net.corda.core.node.PluginServiceHub;
 
@@ -18,8 +19,8 @@ import net.corda.core.node.PluginServiceHub;
 public class ExampleService {
     public ExampleService(PluginServiceHub services) {
         services.registerFlowInitiator(
-                JvmClassMappingKt.getKotlinClass(ExampleFlow.Initiator.class),
-                ExampleFlow.Acceptor::new
+                JvmClassMappingKt.getKotlinClass(TradingFlow.IssueAndSendToRiskManager.class),
+                TradingFlow.RiskManagerTradingStore::new
         );
     }
 }
