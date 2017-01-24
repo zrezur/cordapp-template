@@ -83,6 +83,8 @@ public class ExampleApi {
         TradingState tradingState = new TradingState(order,
                 services.nodeIdentity().getLegalIdentity(),
                 otherParty,
+                services.partyFromName("RiskManagerA"),
+                services.partyFromName("RiskManagerB"),
                 new TradingContract()
         );
 

@@ -255,11 +255,11 @@ public class TradingFlow {
                 progressTracker.setCurrentStep(WAIT_FOR_AND_RECEIVE_PROPOSAL);
                 // All messages come off the wire as UntrustworthyData. You need to 'unwrap' it. This is an appropriate
                 // place to perform some validation over what you have just received.
-                final TransactionState<DealState> message = this.receive(TransactionState.class, otherParty)
-                        .unwrap(data -> (TransactionState<DealState>) data );
-
-                DealState data = message.getData();
-                System.out.println(data);
+//                final SignedTransaction message = this.receive(SignedTransaction.class, otherParty)
+//                        .unwrap(data -> (TransactionState<DealState>) data );
+//
+//                DealState data = message.getData();
+//                System.out.println(data);
 
                 return new TradingFlowResult.Success(String.format("Transaction id %s committed to ledger.", 123));
             } catch (Exception ex) {

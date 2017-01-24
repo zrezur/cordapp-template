@@ -18,6 +18,8 @@ public class TradingState implements DealState {
     private final TradingOrder tradingOrder;
     private final Party buyer;
     private final Party seller;
+    private Party rmA;
+    private Party rmB;
     private final TradingContract contract;
     private final UniqueIdentifier linearId;
 //    private final boolean approved;
@@ -25,12 +27,16 @@ public class TradingState implements DealState {
     public TradingState(TradingOrder tradingOrder,
                               Party buyer,
                               Party seller,
+                              Party rmA,
+                              Party rmB,
                               TradingContract contract
                         )
     {
         this.tradingOrder = tradingOrder;
         this.buyer = buyer;
         this.seller = seller;
+        this.rmA = rmA;
+        this.rmB = rmB;
         this.contract = contract;
         this.linearId = new UniqueIdentifier(tradingOrder.getOrderId(), UUID.randomUUID());
     }
@@ -41,7 +47,7 @@ public class TradingState implements DealState {
     @Override public TradingContract getContract() { return contract; }
     @Override public UniqueIdentifier getLinearId() { return linearId; }
     @Override public String getRef() { return linearId.getExternalId(); }
-    @Override public List<Party> getParties() { return Arrays.asList(buyer, seller); }
+    @Override public List<Party> getParties() { return Arrays.asList(buyer, seller, rmA, rmB); }
     @Override public List<CompositeKey> getParticipants() {
         return getParties()
                 .stream()
