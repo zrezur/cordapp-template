@@ -116,14 +116,12 @@ public class ExampleApi {
                 .build();
     }
 
-    @GET
-    @Path("/create-trade-order")
-    public Response createPurchaseOrder() throws InterruptedException, ExecutionException {
-        final Party otherParty = services.partyFromName("NodeB");
-        TradingOrder.ForwardOrder tradingOrder = new TradingOrder.ForwardOrder();
-        tradingOrder.setNominal(10000);
+    @PUT
+    @Path("${party}/create-trade-order")
+    public Response createTradeOrder(TradingOrder order, @PathParam("party") String partyName) throws InterruptedException, ExecutionException {
+        final Party otherParty = services.partyFromName(partyName);
 
-        TradingState tradingState = new TradingState(tradingOrder,
+        TradingState tradingState = new TradingState(order,
                 services.nodeIdentity().getLegalIdentity(),
                 otherParty,
                 new TradingContract()
