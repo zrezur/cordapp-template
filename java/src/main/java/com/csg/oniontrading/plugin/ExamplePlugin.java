@@ -6,6 +6,7 @@ import com.csg.oniontrading.contract.PurchaseOrderState;
 import com.csg.oniontrading.contract.TradingContract;
 import com.csg.oniontrading.contract.TradingState;
 import com.csg.oniontrading.flow.ExampleFlow;
+import com.csg.oniontrading.flow.TradingFlow;
 import com.csg.oniontrading.model.PurchaseOrder;
 import com.csg.oniontrading.model.TradingOrder;
 import com.csg.oniontrading.service.ExampleService;
@@ -38,12 +39,22 @@ public class ExamplePlugin extends CordaPluginRegistry {
      * This map also acts as a white list. If a flow is invoked via the API and not registered correctly
      * here, then the flow state machine will _not_ invoke the flow. Instead, an exception will be raised.
      */
-    private final Map<String, Set<String>> requiredFlows = Collections.singletonMap(
-            ExampleFlow.Initiator.class.getName(),
-            new HashSet<>(Arrays.asList(
-                    PurchaseOrderState.class.getName(),
-                    Party.class.getName()
-            )));
+
+    private static final Map<String, Set<String>> requiredFlows;
+
+    static {
+        requiredFlows = new HashMap<>();
+        requiredFlows.put(ExampleFlow.Initiator.class.getName(),
+                new HashSet<>(Arrays.asList(
+                        PurchaseOrderState.class.getName(),
+                        Party.class.getName()
+                )));
+        requiredFlows.put(TradingFlow.IssueAndSendToRiskManager.class.getName(),
+                new HashSet<>(Arrays.asList(
+                        TradingState.class.getName(),
+                        Party.class.getName()
+                )));
+    }
 
     /**
      * A list of long lived services to be hosted within the node. Typically you would use these to register flow
@@ -69,22 +80,23 @@ public class ExamplePlugin extends CordaPluginRegistry {
      * Register required types with Kryo (our serialisation framework).
      */
     @Override public boolean registerRPCKryoTypes(Kryo kryo) {
-        kryo.setRegistrationRequired(false);
-//        kryo.register(PurchaseOrderState.class);
-//        kryo.register(PurchaseOrderContract.class);
-//        kryo.register(PurchaseOrder.class);
-//        kryo.register(PurchaseOrder.Address.class);
-//        kryo.register(Date.class);
-//        kryo.register(PurchaseOrder.Item.class);
-//        kryo.register(ExampleFlow.ExampleFlowResult.Success.class);
-//        kryo.register(ExampleFlow.ExampleFlowResult.Failure.class);
-//        kryo.register(IllegalArgumentException.class);
-//        kryo.register(IllegalFlowLogicException.class);
-//        kryo.register(TradingState.class);
-//        kryo.register(TradingContract.class);
-//        kryo.register(TradingOrder.class);
-//        kryo.register(TradingOrder.ForwardOrder.class);
-//        kryo.register(org.joda.time.Interval.class);
+//        kryo.setRegistrationRequired(false);
+        kryo.register(PurchaseOrderState.class);
+        kryo.register(PurchaseOrderContract.class);
+        kryo.register(PurchaseOrder.class);
+        kryo.register(PurchaseOrder.Address.class);
+        kryo.register(Date.class);
+        kryo.register(PurchaseOrder.Item.class);
+        kryo.register(ExampleFlow.ExampleFlowResult.Success.class);
+        kryo.register(ExampleFlow.ExampleFlowResult.Failure.class);
+        kryo.register(IllegalArgumentException.class);
+        kryo.register(IllegalFlowLogicException.class);
+        kryo.register(TradingState.class);
+        kryo.register(TradingContract.class);
+        kryo.register(TradingOrder.class);
+        kryo.register(TradingOrder.ForwardOrder.class);
+        kryo.register(org.joda.time.Interval.class);
+        kryo.register(TradingFlow.IssueAndSendToRiskManager.class);
         return true;
     }
 }
