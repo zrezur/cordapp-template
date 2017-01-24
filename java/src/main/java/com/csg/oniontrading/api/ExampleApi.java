@@ -75,6 +75,8 @@ public class ExampleApi {
 
     @PUT
     @Path("{party}/create-trade-order")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response createTradeOrder(TradingOrder order, @PathParam("party") String partyName) throws InterruptedException, ExecutionException {
         final Party otherParty = services.partyFromName(partyName);
 
@@ -110,6 +112,8 @@ public class ExampleApi {
 
     @POST
     @Path("/approve-trade/{tradeId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response approveTrade(@PathParam("tradeId")String tradeId){
         TradingState tradingState = find(tradeId);
 
