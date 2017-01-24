@@ -157,6 +157,7 @@ public class TradingFlow {
         private static final ProgressTracker.Step RECORDING = new ProgressTracker.Step(
                 "Recording transaction in vault.");
 
+        @Suspendable
         @Override
         public TradingFlowResult call() {
             // Prep.
