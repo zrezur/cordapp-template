@@ -1,7 +1,6 @@
 package com.csg.oniontrading.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
-import com.csg.oniontrading.contract.PurchaseOrderState;
 import com.csg.oniontrading.contract.TradingState;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.DealState;
@@ -109,6 +108,10 @@ public class TradingFlow {
                 final TransactionState offerMessage = new TransactionState<ContractState>(tradingState, notary);
 
                 // Stage 2.
+                progressTracker.setCurrentStep(APPROVAL);
+                sendForApprovalByRiskManager(tradingState);
+
+                // Stage 3.
                 progressTracker.setCurrentStep(SENDING_OFFER_AND_RECEIVING_PARTIAL_TRANSACTION);
                 // Send the state across the wire to the designated counterparty.
                 // -----------------------
@@ -159,6 +162,12 @@ public class TradingFlow {
                 // Just catch all exception types.
                 return new TradingFlowResult.Failure(ex.getMessage());
             }
+        }
+
+        private void sendForApprovalByRiskManager(TradingState tradingState) {
+            //TODO how to validate transaction by manager
+            //TODO how to block flow till approval
+
         }
     }
 
