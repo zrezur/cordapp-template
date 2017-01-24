@@ -35,6 +35,8 @@ public class Main {
                     dsl.startNode("NodeA", emptySet(), singletonList(user), emptyMap());
                     dsl.startNode("NodeB", emptySet(), singletonList(user), emptyMap());
                     dsl.startNode("NodeC", emptySet(), singletonList(user), emptyMap());
+                    dsl.startNode("RiskManagerA", emptySet(), singletonList(user), emptyMap());
+                    dsl.startNode("RiskManagerB", emptySet(), singletonList(user), emptyMap());
                     dsl.waitForAllNodesToFinish();
                     return null;
                 }
