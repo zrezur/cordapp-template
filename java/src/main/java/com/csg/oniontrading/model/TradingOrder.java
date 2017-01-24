@@ -1,14 +1,12 @@
 package com.csg.oniontrading.model;
 
-import org.joda.time.Interval;
-
 import java.util.UUID;
 
 public class TradingOrder {
     private final String orderId;
     private String pair;
     private Integer nominal;
-    private Interval tenor;
+    private String tenor;
 
     public TradingOrder() {
         this.orderId = UUID.randomUUID().toString();
@@ -34,11 +32,11 @@ public class TradingOrder {
         this.nominal = nominal;
     }
 
-    public Interval getTenor() {
+    public String getTenor() {
         return tenor;
     }
 
-    public void setTenor(Interval tenor) {
+    public void setTenor(String tenor) {
         this.tenor = tenor;
     }
 }
