@@ -238,8 +238,9 @@ public class ExampleApi {
             tradingOrder.setPair(data.getAuctionOrder().getPair());
             tradingOrder.setNominal(data.getAuctionOrder().getNominal());
             tradingOrder.setTenor(data.getAuctionOrder().getTenor());
+            tradingOrder.setParty(party);
 
-            return createTradeOrder(tradingOrder, party);
+            return createTradeOrder(tradingOrder);
 
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
