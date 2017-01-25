@@ -1,11 +1,11 @@
 package com.csg.oniontrading.api;
 
 import com.csg.oniontrading.contract.*;
-import com.csg.oniontrading.flow.BuyerApproveAndSendToRiskManager;
-import com.csg.oniontrading.flow.IssueAndSendToRiskManager;
-import com.csg.oniontrading.flow.IssuerRiskManagerApprove;
-import com.csg.oniontrading.flow.TradingFlowResult;
+import com.csg.oniontrading.contract.auction.AuctionPostContract;
+import com.csg.oniontrading.contract.auction.AuctionPostState;
+import com.csg.oniontrading.flow.*;
 import com.csg.oniontrading.model.TradingOrder;
+import com.csg.oniontrading.model.auction.AuctionOrder;
 import net.corda.core.contracts.ContractState;
 import net.corda.core.contracts.StateAndRef;
 import net.corda.core.crypto.Party;
@@ -155,7 +155,7 @@ public class ExampleApi {
 
     }
 
-    private TradingState find(@PathParam("tradeId") String tradeId) {
+    private TradingState find(String tradeId) {
         for (StateAndRef<ContractState> ref : services.vaultAndUpdates().getFirst()) {
             ContractState contractState = ref.component1().getData();
             TradingState tradingState = (TradingState) contractState;
@@ -164,5 +164,45 @@ public class ExampleApi {
             }
         }
         throw new RuntimeException("Can not find trade " + tradeId);
+    }
+
+
+    @POST
+    @Path("auction")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response postAuction(AuctionOrder order) {
+        AuctionPostState postAuctionState = new AuctionPostState(order,
+                services.nodeIdentity().getLegalIdentity(),
+                new AuctionPostContract()
+        );
+
+        // The line below blocks and waits for the flow to return.
+        final TradingFlowResult result = services
+                .startFlowDynamic(StoreAuction.class, postAuctionState)
+                .getReturnValue()
+                .toBlocking()
+                .first();
+
+        final Response.Status status;
+        if (result instanceof TradingFlowResult.Success) {
+            status = Response.Status.CREATED;
+        } else {
+            status = Response.Status.BAD_REQUEST;
+        }
+
+        return Response
+                .status(status)
+                .entity(result.toString())
+                .build();
+    }
+
+    @GET
+    @Path("auctions")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<StateAndRef<ContractState>> getAuctions() {
+        return services.vaultAndUpdates().getFirst().stream()
+                .filter(stateAndRef -> stateAndRef.getState().getData() instanceof AuctionPostState)
+                .collect(toList());
     }
 }
