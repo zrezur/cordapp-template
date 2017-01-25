@@ -28,5 +28,9 @@ public class ExampleService {
                 JvmClassMappingKt.getKotlinClass(BuyerApproveAndSendToRiskManager.class),
                 RiskManagerTradingStore::new
         );
+        services.registerFlowInitiator(
+                JvmClassMappingKt.getKotlinClass(BuyerRiskManagerApprove.class),
+                SellerFinalize::new
+        );
     }
 }
