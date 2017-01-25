@@ -7,6 +7,7 @@ public class TradingOrder {
     private String pair;
     private Integer nominal;
     private String tenor;
+    private String party;
 
     public TradingOrder() {
         this.orderId = UUID.randomUUID().toString();
@@ -38,5 +39,13 @@ public class TradingOrder {
 
     public void setTenor(String tenor) {
         this.tenor = tenor;
+    }
+
+    public String getParty() {
+        return party;
+    }
+
+    public void setParty(String party) {
+        this.party = party;
     }
 }
