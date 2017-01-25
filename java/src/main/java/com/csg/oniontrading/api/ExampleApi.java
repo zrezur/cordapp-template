@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Predicate;
 
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
@@ -121,7 +120,8 @@ public class ExampleApi {
         TradingState tradingState = find(tradeId);
 
         TradingFlowResult result = null;
-        if (isRiskManagerOf(myLegalName)) {
+
+        if (isRiskManager(myLegalName) && isFromSameBank(tradingState.getBuyer())) {
             result = services
                     .startFlowDynamic(IssuerRiskManagerApprove.class, tradingState)
                     .getReturnValue()
@@ -133,6 +133,15 @@ public class ExampleApi {
                     .getReturnValue()
                     .toBlocking()
                     .first();
+        } else if (isRiskManager(myLegalName) && isFromSameBank(tradingState.getSeller())) {
+            result = services
+                    .startFlowDynamic(BuyerRiskManagerApprove.class, tradingState)
+                    .getReturnValue()
+                    .toBlocking()
+                    .first();
+        }
+        else{
+            throw new RuntimeException("Something wrong");
         }
 
         final Response.Status status;
@@ -148,13 +157,18 @@ public class ExampleApi {
                 .build();
     }
 
-    private boolean isRiskManagerOf(String legalName) {
-        if (legalName.startsWith("Node")) {
-            String bankId = myLegalName.substring("Node".length());
-            return myLegalName.startsWith("RiskManager") && myLegalName.endsWith(bankId);
-        } else {
-            return false;
-        }
+    private boolean isFromSameBank(Party buyer) {
+        return myLegalName.substring(myLegalName.length()-1).equals(buyer.getName().substring(buyer.getName().length()-1));
+    }
+
+    private boolean isRiskManager(String legalName) {
+        return legalName.startsWith("RiskManager");
+//        if (legalName.startsWith("Node")) {
+//            String bankId = myLegalName.substring("Node".length());
+//            return myLegalName.startsWith("RiskManager") && myLegalName.endsWith(bankId);
+//        } else {
+//            return false;
+//        }
 
     }
 

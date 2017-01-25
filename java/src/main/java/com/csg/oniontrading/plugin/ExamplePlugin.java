@@ -4,10 +4,7 @@ import com.csg.oniontrading.api.ExampleApi;
 import com.csg.oniontrading.contract.PurchaseOrderState;
 import com.csg.oniontrading.contract.TradingState;
 import com.csg.oniontrading.contract.auction.AuctionPostState;
-import com.csg.oniontrading.flow.ExampleFlow;
-import com.csg.oniontrading.flow.IssueAndSendToRiskManager;
-import com.csg.oniontrading.flow.IssuerRiskManagerApprove;
-import com.csg.oniontrading.flow.StoreAuction;
+import com.csg.oniontrading.flow.*;
 import com.csg.oniontrading.service.ExampleService;
 import com.esotericsoftware.kryo.Kryo;
 import net.corda.core.crypto.Party;
@@ -53,6 +50,14 @@ public class ExamplePlugin extends CordaPluginRegistry {
                         Party.class.getName()
                 )));
         requiredFlows.put(IssuerRiskManagerApprove.class.getName(),
+                new HashSet<>(Arrays.asList(
+                        TradingState.class.getName()
+                )));
+        requiredFlows.put(BuyerRiskManagerApprove.class.getName(),
+                new HashSet<>(Arrays.asList(
+                        TradingState.class.getName()
+                )));
+        requiredFlows.put(BuyerApproveAndSendToRiskManager.class.getName(),
                 new HashSet<>(Arrays.asList(
                         TradingState.class.getName()
                 )));
