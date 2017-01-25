@@ -39,11 +39,6 @@ public class ExamplePlugin extends CordaPluginRegistry {
 
     static {
         requiredFlows = new HashMap<>();
-        requiredFlows.put(ExampleFlow.Initiator.class.getName(),
-                new HashSet<>(Arrays.asList(
-                        PurchaseOrderState.class.getName(),
-                        Party.class.getName()
-                )));
         requiredFlows.put(IssueAndSendToRiskManager.class.getName(),
                 new HashSet<>(Arrays.asList(
                         TradingState.class.getName(),
