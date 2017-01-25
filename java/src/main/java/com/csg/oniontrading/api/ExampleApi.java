@@ -70,11 +70,11 @@ public class ExampleApi {
 
 
     @PUT
-    @Path("{party}/create-trade-order")
+    @Path("create-trade-order")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createTradeOrder(TradingOrder order, @PathParam("party") String partyName) throws InterruptedException, ExecutionException {
-        final Party otherParty = services.partyFromName(partyName);
+    public Response createTradeOrder(TradingOrder order) throws InterruptedException, ExecutionException {
+        final Party otherParty = services.partyFromName(order.getParty());
 
         TradingState tradingState = new TradingState(order,
                 otherParty,
