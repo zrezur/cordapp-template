@@ -186,7 +186,7 @@ public class ExampleApi {
     }
 
 
-    @POST
+    @PUT
     @Path("auction")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
