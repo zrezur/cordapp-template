@@ -1,6 +1,5 @@
 package com.csg.oniontrading.contract;
 
-import com.csg.oniontrading.model.PurchaseOrder;
 import kotlin.Unit;
 import net.corda.core.Utils;
 import net.corda.core.contracts.*;
@@ -8,7 +7,6 @@ import net.corda.core.contracts.clauses.AnyComposition;
 import net.corda.core.contracts.clauses.Clause;
 import net.corda.core.contracts.clauses.GroupClauseVerifier;
 import net.corda.core.crypto.SecureHash;
-import org.jetbrains.annotations.NotNull;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.time.Instant;

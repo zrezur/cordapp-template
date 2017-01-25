@@ -15,11 +15,11 @@ import java.util.Collections;
 /**
  * Created by Y700-17 on 24.01.2017.
  */
-public class RiskManagerTradingStore extends FlowLogic<TradingFlowResult> {
+public class IssuerRiskManagerTradingStore extends FlowLogic<TradingFlowResult> {
 
     private final Party issuer;
 
-    public RiskManagerTradingStore(Party issuer) {
+    public IssuerRiskManagerTradingStore(Party issuer) {
         this.issuer = issuer;
     }
 
