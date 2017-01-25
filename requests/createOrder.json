@@ -1,1 +1,1 @@
-{  "pair":"EURUSD",  "nominal":"100",  "tenor":"1m" }
+{  "pair":"EURUSD",  "nominal":"100",  "tenor":"1m", "party":"NodeB" }

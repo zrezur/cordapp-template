@@ -239,7 +239,7 @@ public class ExampleApi {
             tradingOrder.setNominal(data.getAuctionOrder().getNominal());
             tradingOrder.setTenor(data.getAuctionOrder().getTenor());
 
-            return createTradeOrder(tradingOrder, party);
+            return createTradeOrder(tradingOrder);
 
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
