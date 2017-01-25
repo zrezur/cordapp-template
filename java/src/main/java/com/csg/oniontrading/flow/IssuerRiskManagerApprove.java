@@ -2,6 +2,7 @@ package com.csg.oniontrading.flow;
 
 import co.paralleluniverse.fibers.Suspendable;
 import com.csg.oniontrading.contract.ApprovedTradingState;
+import com.csg.oniontrading.contract.IssuerRiskManagerApprovedTradingState;
 import com.csg.oniontrading.contract.TradingState;
 import com.csg.oniontrading.flow.services.Counterparties;
 import net.corda.core.crypto.Party;

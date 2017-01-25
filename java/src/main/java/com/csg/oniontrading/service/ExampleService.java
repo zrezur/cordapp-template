@@ -18,7 +18,7 @@ public class ExampleService {
     public ExampleService(PluginServiceHub services) {
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(IssueAndSendToRiskManager.class),
-                RiskManagerTradingStore::new
+                IssuerRiskManagerTradingStore::new
         );
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(IssuerRiskManagerApprove.class),
@@ -26,7 +26,7 @@ public class ExampleService {
         );
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(BuyerApproveAndSendToRiskManager.class),
-                RiskManagerTradingStore::new
+                BuyerRiskManagerTradingStore::new
         );
         services.registerFlowInitiator(
                 JvmClassMappingKt.getKotlinClass(BuyerRiskManagerApprove.class),

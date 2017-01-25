@@ -121,7 +121,7 @@ public class ExampleApi {
 
         TradingFlowResult result = null;
 
-        if (isRiskManager(myLegalName) && isFromSameBank(tradingState.getBuyer())) {
+        if (isRiskManager(myLegalName) && isFromSameBank(tradingState.getSeller())) {
             result = services
                     .startFlowDynamic(IssuerRiskManagerApprove.class, tradingState)
                     .getReturnValue()
@@ -133,7 +133,7 @@ public class ExampleApi {
                     .getReturnValue()
                     .toBlocking()
                     .first();
-        } else if (isRiskManager(myLegalName) && isFromSameBank(tradingState.getSeller())) {
+        } else if (isRiskManager(myLegalName) && isFromSameBank(tradingState.getBuyer())) {
             result = services
                     .startFlowDynamic(BuyerRiskManagerApprove.class, tradingState)
                     .getReturnValue()
@@ -175,9 +175,11 @@ public class ExampleApi {
     private TradingState find(String tradeId) {
         for (StateAndRef<ContractState> ref : services.vaultAndUpdates().getFirst()) {
             ContractState contractState = ref.component1().getData();
-            TradingState tradingState = (TradingState) contractState;
-            if (tradingState.getTradingOrder().getOrderId().equalsIgnoreCase(tradeId)) {
-                return tradingState;
+            if(contractState instanceof TradingState){
+                TradingState tradingState = (TradingState) contractState;
+                if (tradingState.getTradingOrder().getOrderId().equalsIgnoreCase(tradeId)) {
+                    return tradingState;
+                }
             }
         }
         throw new RuntimeException("Can not find trade " + tradeId);
