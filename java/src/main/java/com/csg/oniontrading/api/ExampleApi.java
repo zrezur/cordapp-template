@@ -186,7 +186,7 @@ public class ExampleApi {
     }
 
 
-    @POST
+    @PUT
     @Path("auction")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -238,6 +238,7 @@ public class ExampleApi {
             tradingOrder.setPair(data.getAuctionOrder().getPair());
             tradingOrder.setNominal(data.getAuctionOrder().getNominal());
             tradingOrder.setTenor(data.getAuctionOrder().getTenor());
+            tradingOrder.setParty(party);
 
             return createTradeOrder(tradingOrder);
 
